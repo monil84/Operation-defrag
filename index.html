@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>14-Day Career Sprint Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1f2937; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+        .glass-panel { background: rgba(31, 41, 55, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(75, 85, 99, 0.4); }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 h-screen overflow-hidden flex flex-col">
+
+    <!-- Top Navigation -->
+    <header class="bg-gray-800 border-b border-gray-700 p-4 flex justify-between items-center z-10 shadow-md">
+        <div class="flex items-center gap-3">
+            <div class="bg-indigo-600 p-2 rounded-lg"><i data-lucide="rocket" class="text-white w-5 h-5"></i></div>
+            <div>
+                <h1 class="text-xl font-bold leading-tight">Operation Defrag</h1>
+                <p class="text-xs text-gray-400">14-Day Sprint Command Center</p>
+            </div>
+        </div>
+
+        <!-- Role Toggle -->
+        <div class="flex bg-gray-900 rounded-lg p-1 border border-gray-700">
+            <button onclick="setRole('All')" id="btn-All" class="role-btn px-4 py-1.5 text-sm font-semibold rounded-md bg-indigo-600 text-white transition">All Roles</button>
+            <button onclick="setRole('Frontend')" id="btn-Frontend" class="role-btn px-4 py-1.5 text-sm font-semibold rounded-md text-gray-400 hover:text-white transition">Frontend</button>
+            <button onclick="setRole('QA')" id="btn-QA" class="role-btn px-4 py-1.5 text-sm font-semibold rounded-md text-gray-400 hover:text-white transition">QA</button>
+            <button onclick="setRole('Data')" id="btn-Data" class="role-btn px-4 py-1.5 text-sm font-semibold rounded-md text-gray-400 hover:text-white transition">Data</button>
+        </div>
+
+        <!-- 16 Hour Timer -->
+        <div class="flex items-center gap-4 bg-gray-900 px-4 py-2 rounded-lg border border-gray-700">
+            <div class="flex items-center gap-2">
+                <i data-lucide="clock" class="text-indigo-400"></i>
+                <span id="timer-display" class="text-2xl font-mono font-bold text-white tracking-wider">16:00:00</span>
+            </div>
+            <div class="flex gap-2 border-l border-gray-700 pl-4">
+                <button onclick="toggleTimer()" id="timer-btn" class="text-gray-400 hover:text-green-400 transition"><i data-lucide="play" class="w-5 h-5"></i></button>
+                <button onclick="resetTimer()" class="text-gray-400 hover:text-red-400 transition"><i data-lucide="rotate-ccw" class="w-5 h-5"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dashboard -->
+    <main class="flex-1 overflow-hidden flex p-4 gap-4">
+        
+        <!-- Left Column: 14 Day Roadmap -->
+        <section class="w-1/2 flex flex-col gap-4">
+            <div class="glass-panel rounded-xl p-4 flex flex-col h-full overflow-hidden shadow-lg">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-bold flex items-center gap-2"><i data-lucide="map" class="text-indigo-400"></i> Master Roadmap (<span id="role-label">All Roles</span>)</h2>
+                    <span class="text-xs bg-indigo-900 text-indigo-300 px-2 py-1 rounded-full border border-indigo-700">Target: Interview Ready by Day 7</span>
+                </div>
+                
+                <div id="roadmap-container" class="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-4">
+                    <!-- Dynamic Content Injected Here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Column: Project & Vault -->
+        <section class="w-1/2 flex flex-col gap-4">
+            
+            <!-- Top Right: E-APMC Project Tracker -->
+            <div class="glass-panel rounded-xl p-4 flex-1 flex flex-col overflow-hidden shadow-lg border-t-4 border-t-green-500">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="text-lg font-bold flex items-center gap-2"><i data-lucide="layout-template" class="text-green-400"></i> E-APMC Refactor Tracker</h2>
+                    <span class="text-xs text-gray-400">ASP.NET Core / Angular / MongoDB</span>
+                </div>
+                <div class="flex-1 overflow-y-auto custom-scrollbar" id="project-tasks">
+                    <!-- Dynamic Content -->
+                </div>
+            </div>
+
+            <!-- Bottom Right: Concept Vault -->
+            <div class="glass-panel rounded-xl p-4 flex-1 flex flex-col shadow-lg border-t-4 border-t-yellow-500">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="text-lg font-bold flex items-center gap-2"><i data-lucide="brain-circuit" class="text-yellow-400"></i> Concept Vault</h2>
+                    <p class="text-xs text-gray-400">Record jargon, DSA notes, and academic mappings</p>
+                </div>
+                
+                <div class="flex gap-2 mb-3">
+                    <input type="text" id="vault-input" placeholder="e.g., Dependency Injection = passing services into classes..." class="flex-1 bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-500 transition">
+                    <button onclick="addVaultItem()" class="bg-yellow-600 hover:bg-yellow-500 text-white px-4 py-2 rounded-lg text-sm font-semibold transition"><i data-lucide="plus" class="w-4 h-4"></i></button>
+                </div>
+                
+                <div id="vault-container" class="flex-1 overflow-y-auto custom-scrollbar space-y-2">
+                    <!-- Dynamic Content -->
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <script>
+        let currentRole = 'All';
+        let timerInterval;
+        let timeLeft = 16 * 60 * 60; 
+        let isTimerRunning = false;
+
+        const roadmapData = [
+            { day: 1, title: "Day 1: Defrag Web Basics & JS", tasks: [
+                { id: 101, role: ['Frontend', 'All'], text: 'Colt Steele: Web Dev HTML/CSS Sections (Review)', done: false },
+                { id: 102, role: ['Frontend', 'All'], text: 'Jonas: JS Fundamentals Part 1 & 2', done: false },
+                { id: 103, role: ['Data', 'All'], text: 'Emenwa: Python Setup & Basics', done: false },
+            ]},
+            { day: 2, title: "Day 2: Core Logic & DOM", tasks: [
+                { id: 201, role: ['Frontend', 'All'], text: 'Jonas: DOM Manipulation & Advanced DOM', done: false },
+                { id: 202, role: ['Frontend', 'QA', 'All'], text: 'Emenwa: OOP Concepts in C# (For ASP.NET)', done: false },
+                { id: 203, role: ['Data', 'All'], text: 'Emenwa: SQL Data Types & Basic Queries', done: false },
+            ]},
+            { day: 3, title: "Day 3: Databases & Async", tasks: [
+                { id: 301, role: ['Frontend', 'All'], text: 'Jonas: Asynchronous JS, Promises, Async/Await', done: false },
+                { id: 302, role: ['Data', 'QA', 'Frontend', 'All'], text: 'Academind: MongoDB Setup & Basic CRUD operations', done: false },
+                { id: 303, role: ['Data', 'All'], text: 'Emenwa: SQL Joins and Aggregations', done: false },
+            ]},
+            { day: 4, title: "Day 4: Frameworks Foundation", tasks: [
+                { id: 401, role: ['Frontend', 'All'], text: 'Max S: Angular Basics & Components', done: false },
+                { id: 402, role: ['Frontend', 'All'], text: 'Max S: Angular Databinding & Directives', done: false },
+                { id: 403, role: ['QA', 'All'], text: 'Tarek: Intro to Software Testing & Test Cases', done: false },
+            ]},
+            { day: 5, title: "Day 5: APIs & Automation Intro", tasks: [
+                { id: 501, role: ['Frontend', 'All'], text: 'Max S: Angular Services & Dependency Injection', done: false },
+                { id: 502, role: ['Frontend', 'All'], text: 'Emenwa: Build a simple ASP.NET Core API', done: false },
+                { id: 503, role: ['QA', 'All'], text: 'Tarek: Web UI Automation Basics', done: false },
+            ]},
+            { day: 6, title: "Day 6: Full Stack Wiring", tasks: [
+                { id: 601, role: ['Frontend', 'All'], text: 'Max S: Angular Http Requests (Connect to API)', done: false },
+                { id: 602, role: ['Data', 'All'], text: 'Academind: MongoDB Advanced Queries & Indexes', done: false },
+                { id: 603, role: ['QA', 'All'], text: 'Tarek: API Testing Basics (Postman)', done: false },
+            ]},
+            { day: 7, title: "Day 7: INTERVIEW READINESS SPRINT", tasks: [
+                { id: 701, role: ['All'], text: 'Update Resume & LinkedIn (Highlight 8.57 CGPA & E-APMC)', done: false },
+                { id: 702, role: ['All'], text: 'Practice "Tell me about yourself" focusing on Degree + Project', done: false },
+                { id: 703, role: ['All'], text: 'Mock Interview on core concepts (Vault review)', done: false },
+                { id: 704, role: ['All'], text: 'Apply to first 10 Entry/Junior Level Roles', done: false },
+            ]},
+            { day: 8, title: "Day 8: Deep Dive - Routing & State", tasks: [
+                { id: 801, role: ['Frontend', 'All'], text: 'Max S: Angular Routing & Guards', done: false },
+                { id: 802, role: ['Frontend', 'QA', 'All'], text: 'Max S: Angular Forms (Template & Reactive)', done: false },
+            ]},
+            { day: 9, title: "Day 9: Backend Auth & Security", tasks: [
+                { id: 901, role: ['Frontend', 'All'], text: 'Emenwa: C# JWT Authentication implementation', done: false },
+                { id: 902, role: ['Frontend', 'All'], text: 'Max S: Angular Interceptors & Auth State', done: false },
+            ]},
+            { day: 10, title: "Day 10: Advanced Data & QA", tasks: [
+                { id: 1001, role: ['QA', 'All'], text: 'Tarek: Advanced Automation Scripts', done: false },
+                { id: 1002, role: ['Data', 'All'], text: 'Academind: MongoDB Aggregation Framework', done: false },
+            ]},
+            { day: 11, title: "Day 11: E-APMC Feature Lock", tasks: [
+                { id: 1101, role: ['All'], text: 'Finalize E-APMC Core User Flows', done: false },
+                { id: 1102, role: ['All'], text: 'Implement MongoDB data seed script', done: false },
+            ]},
+            { day: 12, title: "Day 12: Project Polish", tasks: [
+                { id: 1201, role: ['Frontend', 'All'], text: 'Colt Steele: UI Polish, Responsive Design Review', done: false },
+                { id: 1202, role: ['QA', 'All'], text: 'Tarek: End-to-End Test for E-APMC', done: false },
+            ]},
+            { day: 13, title: "Day 13: Architecture & System Design", tasks: [
+                { id: 1301, role: ['All'], text: 'Document E-APMC Architecture (Draw.io)', done: false },
+                { id: 1302, role: ['All'], text: 'Review Code Structure (Clean Code principles)', done: false },
+            ]},
+            { day: 14, title: "Day 14: Deployment & Review", tasks: [
+                { id: 1401, role: ['All'], text: 'Deploy Angular Frontend (Vercel/Netlify)', done: false },
+                { id: 1402, role: ['All'], text: 'Deploy ASP.NET Backend & Mongo Atlas', done: false },
+                { id: 1403, role: ['All'], text: 'Apply to 30 more jobs. Rest.', done: false },
+            ]},
+        ];
+
+        let projectTasks = [
+            { id: 'p1', text: 'Clone/Setup Repo locally. Verify .NET Core CLI & Node.', done: false },
+            { id: 'p2', text: 'Ensure MongoDB Atlas cluster is active & connection string secured.', done: false },
+            { id: 'p3', text: 'Refactor ASP.NET Controllers to standard RESTful patterns.', done: false },
+            { id: 'p4', text: 'Upgrade Angular App to standalone components (if applicable).', done: false },
+            { id: 'p5', text: 'Implement visual redesign using Tailwind/Bootstrap.', done: false },
+            { id: 'p6', text: 'Add simple unit tests to business logic.', done: false },
+            { id: 'p7', text: 'Write comprehensive README.md with screenshots.', done: false }
+        ];
+
+        let vaultItems = [
+            { text: "Abstraction = Hiding complex background details (like a car engine).", date: "System" },
+            { text: "Polymorphism = Same method name, different behavior (Method Overloading/Overriding).", date: "System" },
+            { text: "HTTP Status: 200 (OK), 400 (Bad Request), 401 (Unauth), 404 (Not Found), 500 (Server Error)", date: "System" }
+        ];
+
+        window.onload = () => {
+            lucide.createIcons();
+            renderRoadmap();
+            renderProjectTracker();
+            renderVault();
+        };
+
+        function setRole(role) {
+            currentRole = role;
+            document.getElementById('role-label').innerText = role === 'All' ? 'All Roles' : role;
+            
+            document.querySelectorAll('.role-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white');
+                btn.classList.add('text-gray-400');
+            });
+            const activeBtn = document.getElementById(`btn-${role}`);
+            activeBtn.classList.remove('text-gray-400');
+            activeBtn.classList.add('bg-indigo-600', 'text-white');
+
+            renderRoadmap();
+        }
+
+        function formatTime(seconds) {
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = seconds % 60;
+            return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+
+        function toggleTimer() {
+            const btnIcon = document.querySelector('#timer-btn i');
+            if (isTimerRunning) {
+                clearInterval(timerInterval);
+                btnIcon.setAttribute('data-lucide', 'play');
+                btnIcon.classList.remove('text-yellow-400');
+            } else {
+                timerInterval = setInterval(() => {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        document.getElementById('timer-display').innerText = formatTime(timeLeft);
+                    } else {
+                        clearInterval(timerInterval);
+                        alert("16 Hour Sprint Complete! Time to rest.");
+                    }
+                }, 1000);
+                btnIcon.setAttribute('data-lucide', 'pause');
+                btnIcon.classList.add('text-yellow-400');
+            }
+            isTimerRunning = !isTimerRunning;
+            lucide.createIcons();
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 16 * 60 * 60;
+            isTimerRunning = false;
+            document.getElementById('timer-display').innerText = formatTime(timeLeft);
+            const btnIcon = document.querySelector('#timer-btn i');
+            btnIcon.setAttribute('data-lucide', 'play');
+            btnIcon.classList.remove('text-yellow-400');
+            lucide.createIcons();
+        }
+
+        function renderRoadmap() {
+            const container = document.getElementById('roadmap-container');
+            container.innerHTML = '';
+
+            roadmapData.forEach(dayInfo => {
+                const filteredTasks = dayInfo.tasks.filter(t => t.role.includes(currentRole) || currentRole === 'All');
+                if (filteredTasks.length === 0) return; 
+
+                let isDayTarget = dayInfo.day === 7;
+                const dayEl = document.createElement('div');
+                dayEl.className = `bg-gray-800 rounded-lg p-3 border ${isDayTarget ? 'border-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.3)]' : 'border-gray-700'}`;
+                
+                let html = `
+                    <h3 class="font-bold text-gray-200 mb-2 ${isDayTarget ? 'text-indigo-400' : ''}">${dayInfo.title}</h3>
+                    <ul class="space-y-2">
+                `;
+
+                filteredTasks.forEach(task => {
+                    html += `
+                        <li class="flex items-start gap-2 group">
+                            <input type="checkbox" id="task-${task.id}" ${task.done ? 'checked' : ''} 
+                                   onchange="toggleRoadmapTask(${dayInfo.day}, ${task.id})"
+                                   class="mt-1 bg-gray-900 border-gray-600 rounded text-indigo-500 focus:ring-indigo-500 cursor-pointer">
+                            <label for="task-${task.id}" class="text-sm cursor-pointer ${task.done ? 'line-through text-gray-500' : 'text-gray-300 group-hover:text-white transition'}">
+                                ${task.text}
+                            </label>
+                        </li>
+                    `;
+                });
+
+                html += `</ul>`;
+                dayEl.innerHTML = html;
+                container.appendChild(dayEl);
+            });
+        }
+
+        function toggleRoadmapTask(dayNum, taskId) {
+            const dayInfo = roadmapData.find(d => d.day === dayNum);
+            const task = dayInfo.tasks.find(t => t.id === taskId);
+            task.done = !task.done;
+            renderRoadmap();
+        }
+
+        function renderProjectTracker() {
+            const container = document.getElementById('project-tasks');
+            container.innerHTML = '<ul class="space-y-2 pb-2">';
+            projectTasks.forEach(task => {
+                container.innerHTML += `
+                    <li class="flex items-start gap-3 bg-gray-800 p-2 rounded-lg border border-gray-700 transition hover:border-green-500/50">
+                        <input type="checkbox" id="pt-${task.id}" ${task.done ? 'checked' : ''} 
+                               onchange="toggleProjectTask('${task.id}')"
+                               class="mt-1 accent-green-500 w-4 h-4 cursor-pointer">
+                        <label for="pt-${task.id}" class="text-sm cursor-pointer ${task.done ? 'line-through text-gray-500' : 'text-gray-300'}">
+                            ${task.text}
+                        </label>
+                    </li>
+                `;
+            });
+            container.innerHTML += '</ul>';
+        }
+
+        function toggleProjectTask(id) {
+            const task = projectTasks.find(t => t.id === id);
+            task.done = !task.done;
+            renderProjectTracker();
+        }
+
+        function renderVault() {
+            const container = document.getElementById('vault-container');
+            container.innerHTML = '';
+            
+            [...vaultItems].reverse().forEach((item, index) => {
+                container.innerHTML += `
+                    <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 text-sm flex justify-between items-start gap-2 hover:border-yellow-500/50 transition">
+                        <p class="text-gray-300">"${item.text}"</p>
+                        <button onclick="removeVaultItem(${vaultItems.length - 1 - index})" class="text-gray-500 hover:text-red-400 transition flex-shrink-0">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                `;
+            });
+            lucide.createIcons();
+        }
+
+        function addVaultItem() {
+            const input = document.getElementById('vault-input');
+            const text = input.value.trim();
+            if (text) {
+                vaultItems.push({ text: text, date: new Date().toLocaleTimeString() });
+                input.value = '';
+                renderVault();
+            }
+        }
+
+        function removeVaultItem(index) {
+            vaultItems.splice(index, 1);
+            renderVault();
+        }
+    </script>
+</body>
+</html>
